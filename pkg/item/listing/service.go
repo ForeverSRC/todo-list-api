@@ -1,13 +1,19 @@
 package listing
 
-import "fmt"
+import (
+	"context"
+
+	"github.com/ForeverSRC/todo-list-api/pkg/dto"
+	"github.com/ForeverSRC/todo-list-api/pkg/model"
+	"github.com/ForeverSRC/todo-list-api/pkg/repository"
+)
 
 type Service interface {
-	ListItems(*ItemListQuery) (ItemList, error)
+	ListItems(ctx context.Context, query *dto.ItemListQuery) (model.ItemList, error)
 }
 
 type Repository interface {
-	FetchItems(*ItemListQuery) (ItemList, error)
+	repository.ItemLister
 }
 
 type service struct {
@@ -18,16 +24,12 @@ func NewService(r Repository) Service {
 	return &service{repo: r}
 }
 
-func (s *service) ListItems(q *ItemListQuery) (ItemList, error) {
-	if q.Uid == "" {
-		return nil, fmt.Errorf("user not login")
-	}
-
-	if err := q.CheckAndFix(); err != nil {
+func (s *service) ListItems(ctx context.Context, query *dto.ItemListQuery) (model.ItemList, error) {
+	if err := query.CheckAndFix(); err != nil {
 		return nil, err
 	}
 
-	l, err := s.repo.FetchItems(q)
+	l, err := s.repo.FetchItems(ctx, query)
 	if err != nil {
 		return nil, err
 	}

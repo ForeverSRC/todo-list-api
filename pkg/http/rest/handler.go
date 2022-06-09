@@ -6,6 +6,7 @@ import (
 	"github.com/ForeverSRC/todo-list-api/pkg/config"
 	itemcreating "github.com/ForeverSRC/todo-list-api/pkg/item/creating"
 	itemlisting "github.com/ForeverSRC/todo-list-api/pkg/item/listing"
+	itemmanaging "github.com/ForeverSRC/todo-list-api/pkg/item/managing"
 	"github.com/gin-gonic/gin"
 )
 
@@ -22,12 +23,12 @@ type Response struct {
 	Message string      `json:"message"`
 }
 
-func Handler(ic itemcreating.Service, il itemlisting.Service) *gin.Engine {
+func Handler(ic itemcreating.Service, il itemlisting.Service, im itemmanaging.Service) *gin.Engine {
 	gin.SetMode(config.Config.GetString("ginMode"))
 
 	router := gin.Default()
 
-	loadApiRouterGroup(router, ic, il)
+	loadApiRouterGroup(router, ic, il, im)
 
 	return router
 }

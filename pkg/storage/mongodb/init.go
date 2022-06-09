@@ -33,6 +33,8 @@ func NewStorage(connStr string, db string) *Storage {
 		panic(err)
 	}
 
+	store.Item = store.db.Collection("item")
+
 	return store
 }
 
@@ -88,4 +90,11 @@ func (s *Storage) Close() error {
 func defaultMongoContext() (ctx context.Context, cancel context.CancelFunc) {
 	ctx, cancel = context.WithTimeout(context.Background(), 10*time.Second)
 	return
+}
+
+func wrapContextWithTimeout(ctx context.Context) (context.Context, context.CancelFunc) {
+	if ctx == nil {
+		return defaultMongoContext()
+	}
+	return context.WithTimeout(ctx, 10*time.Second)
 }

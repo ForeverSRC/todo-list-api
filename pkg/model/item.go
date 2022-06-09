@@ -28,8 +28,8 @@ func (s ItemState) ValidState() bool {
 }
 
 type Item struct {
-	Title       string   `json:"title" bson:"title"`
-	Uid         string   `json:"uid" bson:"uid"`
+	Id          string   `json:"id" bson:"_id"`
+	Title       string   `json:"title" bson:"title" binding:"required"`
 	Tags        []string `json:"tags" bson:"tags"`
 	Score       uint     `json:"score" bson:"score"`
 	Description string   `json:"description" bson:"description"`
@@ -39,3 +39,5 @@ type Item struct {
 	CreateTime time.Time `json:"createTime" bson:"create_time"`
 	FinishTime time.Time `json:"finishTime" bson:"finish_time"`
 }
+
+type ItemList []Item

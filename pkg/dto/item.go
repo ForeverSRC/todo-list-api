@@ -1,4 +1,4 @@
-package listing
+package dto
 
 import (
 	"fmt"
@@ -11,8 +11,6 @@ const (
 	defaultPage     = 1
 	defaultPageSize = 5
 )
-
-type ItemList []model.Item
 
 type ItemListQuery struct {
 	Uid      string          `form:"uid"`

@@ -2,5 +2,5 @@ ginMode: debug
 port: 8080
 
 mongo:
-  url: mongodb://root:root@localhost:27017/?authSource=admin&authMechanism=SCRAM-SHA-1&readPreference=secondaryPreferred
+  url: mongodb://admin:123456@localhost:27017/
   db: todo-list
