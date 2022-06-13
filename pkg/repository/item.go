@@ -3,8 +3,8 @@ package repository
 import (
 	"context"
 
-	"github.com/ForeverSRC/todo-list-api/pkg/dto"
 	"github.com/ForeverSRC/todo-list-api/pkg/model"
+	"github.com/ForeverSRC/todo-list-api/pkg/vo"
 )
 
 type ItemGetter interface {
@@ -16,7 +16,7 @@ type ItemCreator interface {
 }
 
 type ItemLister interface {
-	FetchItems(ctx context.Context, query *dto.ItemListQuery) (model.ItemList, error)
+	FetchItems(ctx context.Context, query *vo.ItemListQuery) (model.ItemList, error)
 }
 
 type ItemUpdater interface {

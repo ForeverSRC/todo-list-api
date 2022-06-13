@@ -3,11 +3,11 @@ package rest
 import (
 	"fmt"
 
-	"github.com/ForeverSRC/todo-list-api/pkg/dto"
-	itemcreating "github.com/ForeverSRC/todo-list-api/pkg/item/creating"
-	itemlisting "github.com/ForeverSRC/todo-list-api/pkg/item/listing"
-	itemmanaging "github.com/ForeverSRC/todo-list-api/pkg/item/managing"
 	"github.com/ForeverSRC/todo-list-api/pkg/model"
+	itemcreating "github.com/ForeverSRC/todo-list-api/pkg/service/item/creating"
+	itemlisting "github.com/ForeverSRC/todo-list-api/pkg/service/item/listing"
+	itemmanaging "github.com/ForeverSRC/todo-list-api/pkg/service/item/managing"
+	"github.com/ForeverSRC/todo-list-api/pkg/vo"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,7 +23,7 @@ func loadApiRouterGroup(router *gin.Engine, ic itemcreating.Service, il itemlist
 
 func createItem(ic itemcreating.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var item model.Item
+		var item model.ItemVo
 
 		if err := c.ShouldBind(&item); err != nil {
 			errJsonRes(c, fmt.Sprintf("binding error: %v", err))
@@ -41,7 +41,7 @@ func createItem(ic itemcreating.Service) gin.HandlerFunc {
 
 func listItems(il itemlisting.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var q dto.ItemListQuery
+		var q vo.ItemListQuery
 		if err := c.ShouldBindQuery(&q); err != nil {
 			errJsonRes(c, fmt.Sprintf("binding error: %v", err))
 			return
@@ -67,7 +67,7 @@ func changeItemState(im itemmanaging.Service) gin.HandlerFunc {
 			return
 		}
 
-		var req itemmanaging.Request
+		var req vo.ItemManageRequest
 		if err := c.ShouldBind(&req); err != nil {
 			errJsonRes(c, fmt.Sprintf("binding error: %v", err))
 			return

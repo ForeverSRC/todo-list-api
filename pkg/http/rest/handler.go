@@ -4,9 +4,9 @@ import (
 	"net/http"
 
 	"github.com/ForeverSRC/todo-list-api/pkg/config"
-	itemcreating "github.com/ForeverSRC/todo-list-api/pkg/item/creating"
-	itemlisting "github.com/ForeverSRC/todo-list-api/pkg/item/listing"
-	itemmanaging "github.com/ForeverSRC/todo-list-api/pkg/item/managing"
+	itemcreating "github.com/ForeverSRC/todo-list-api/pkg/service/item/creating"
+	itemlisting "github.com/ForeverSRC/todo-list-api/pkg/service/item/listing"
+	itemmanaging "github.com/ForeverSRC/todo-list-api/pkg/service/item/managing"
 	"github.com/gin-gonic/gin"
 )
 

@@ -1,6 +1,8 @@
 package model
 
-import "time"
+import (
+	"time"
+)
 
 type ItemState uint
 
@@ -28,11 +30,9 @@ func (s ItemState) ValidState() bool {
 }
 
 type Item struct {
-	Id          string   `json:"id" bson:"_id"`
-	Title       string   `json:"title" bson:"title" binding:"required"`
-	Tags        []string `json:"tags" bson:"tags"`
-	Score       uint     `json:"score" bson:"score"`
-	Description string   `json:"description" bson:"description"`
+	Id string `json:"id" bson:"_id"`
+
+	ItemVo
 
 	State ItemState `json:"state" bson:"state"`
 
@@ -41,3 +41,10 @@ type Item struct {
 }
 
 type ItemList []Item
+
+type ItemVo struct {
+	Title       string   `json:"title" bson:"title" binding:"required"`
+	Tags        []string `json:"tags" bson:"tags"`
+	Score       uint     `json:"score" bson:"score"`
+	Description string   `json:"description" bson:"description"`
+}
