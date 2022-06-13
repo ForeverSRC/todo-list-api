@@ -3,8 +3,8 @@ package mongodb
 import (
 	"context"
 
-	itemlisting "github.com/ForeverSRC/todo-list-api/pkg/dto"
 	"github.com/ForeverSRC/todo-list-api/pkg/model"
+	"github.com/ForeverSRC/todo-list-api/pkg/vo"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -23,7 +23,7 @@ func (s *Storage) InsertItem(ctx context.Context, item model.Item) error {
 
 }
 
-func (s *Storage) FetchItems(ctx context.Context, query *itemlisting.ItemListQuery) (model.ItemList, error) {
+func (s *Storage) FetchItems(ctx context.Context, query *vo.ItemListQuery) (model.ItemList, error) {
 	skip := query.PageSize * (query.Page - 1)
 	filter := bson.D{
 		{Key: "state", Value: query.State},

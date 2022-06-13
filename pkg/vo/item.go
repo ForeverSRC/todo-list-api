@@ -1,4 +1,4 @@
-package dto
+package vo
 
 import (
 	"fmt"
@@ -30,4 +30,9 @@ func (q *ItemListQuery) CheckAndFix() error {
 	}
 
 	return nil
+}
+
+type ItemManageRequest struct {
+	Id    string          `json:"id"`
+	State model.ItemState `json:"state"`
 }

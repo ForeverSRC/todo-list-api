@@ -3,13 +3,13 @@ package listing
 import (
 	"context"
 
-	"github.com/ForeverSRC/todo-list-api/pkg/dto"
 	"github.com/ForeverSRC/todo-list-api/pkg/model"
 	"github.com/ForeverSRC/todo-list-api/pkg/repository"
+	"github.com/ForeverSRC/todo-list-api/pkg/vo"
 )
 
 type Service interface {
-	ListItems(ctx context.Context, query *dto.ItemListQuery) (model.ItemList, error)
+	ListItems(ctx context.Context, query *vo.ItemListQuery) (model.ItemList, error)
 }
 
 type Repository interface {
@@ -24,7 +24,7 @@ func NewService(r Repository) Service {
 	return &service{repo: r}
 }
 
-func (s *service) ListItems(ctx context.Context, query *dto.ItemListQuery) (model.ItemList, error) {
+func (s *service) ListItems(ctx context.Context, query *vo.ItemListQuery) (model.ItemList, error) {
 	if err := query.CheckAndFix(); err != nil {
 		return nil, err
 	}

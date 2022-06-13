@@ -10,7 +10,7 @@ import (
 var Config *viper.Viper
 
 func Init() {
-	newConfig("./pkg/conf", "")
+	newConfig("/conf", "")
 }
 
 func newConfig(path string, mode string) {

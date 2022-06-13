@@ -6,10 +6,11 @@ import (
 
 	"github.com/ForeverSRC/todo-list-api/pkg/model"
 	"github.com/ForeverSRC/todo-list-api/pkg/repository"
+	"github.com/ForeverSRC/todo-list-api/pkg/vo"
 )
 
 type Service interface {
-	ChangeItemState(ctx context.Context, req *Request) error
+	ChangeItemState(ctx context.Context, req *vo.ItemManageRequest) error
 }
 
 type Repository interface {
@@ -27,7 +28,7 @@ func NewService(r Repository) Service {
 	}
 }
 
-func (s *service) ChangeItemState(ctx context.Context, req *Request) error {
+func (s *service) ChangeItemState(ctx context.Context, req *vo.ItemManageRequest) error {
 	item, err := s.repo.GetItem(ctx, req.Id)
 	if err != nil {
 		return err
