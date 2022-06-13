@@ -73,3 +73,6 @@ in `pkg`:
   * http adapter
 
 
+### Hexagonal architecture
+
+![img.png](img.png)
