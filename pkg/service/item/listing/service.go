@@ -25,8 +25,10 @@ func NewService(r Repository) Service {
 }
 
 func (s *service) ListItems(ctx context.Context, query *vo.ItemListQuery) (model.ItemList, error) {
-	if err := query.CheckAndFix(); err != nil {
-		return nil, err
+	if query.State != 0 {
+		if err := query.CheckAndFix(); err != nil {
+			return nil, err
+		}
 	}
 
 	l, err := s.repo.FetchItems(ctx, query)

@@ -22,3 +22,7 @@ type ItemLister interface {
 type ItemUpdater interface {
 	UpdateItem(ctx context.Context, id string, item model.Item) error
 }
+
+type ItemDeleter interface {
+	DeleteItem(ctx context.Context, id string) error
+}

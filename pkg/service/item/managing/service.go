@@ -29,17 +29,17 @@ func NewService(r Repository) Service {
 }
 
 func (s *service) ChangeItemState(ctx context.Context, req *vo.ItemManageRequest) error {
-	item, err := s.repo.GetItem(ctx, req.Id)
-	if err != nil {
-		return err
+	item := model.Item{
+		State: req.State.Pointer(),
 	}
 
-	item.State = req.State
+	now := time.Now()
+	item.UpdateTime = now
 	if req.State == model.ItemStateFinished {
-		item.FinishTime = time.Now()
+		item.FinishTime = now
 	}
 
-	err = s.repo.UpdateItem(ctx, req.Id, *item)
+	err := s.repo.UpdateItem(ctx, req.Id, item)
 	if err != nil {
 		return err
 	}

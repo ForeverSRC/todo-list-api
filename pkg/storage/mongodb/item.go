@@ -25,14 +25,16 @@ func (s *Storage) InsertItem(ctx context.Context, item model.Item) error {
 
 func (s *Storage) FetchItems(ctx context.Context, query *vo.ItemListQuery) (model.ItemList, error) {
 	skip := query.PageSize * (query.Page - 1)
-	filter := bson.D{
-		{Key: "state", Value: query.State},
-	}
 
 	result := make(model.ItemList, 0, query.PageSize)
 
 	mongoCtx, cancel := wrapContextWithTimeout(ctx)
 	defer cancel()
+
+	filter := make(bson.D, 0)
+	if query.State != 0 {
+		filter = append(filter, bson.E{Key: "state", Value: query.State})
+	}
 
 	count, err := s.Item.CountDocuments(mongoCtx, filter)
 	if err != nil {
@@ -99,11 +101,30 @@ func (s *Storage) UpdateItem(ctx context.Context, id string, item model.Item) er
 	mongoCtx, cancel := wrapContextWithTimeout(ctx)
 	defer cancel()
 
-	_, err = s.Item.UpdateByID(mongoCtx, oid, item)
+	_, err = s.Item.UpdateByID(mongoCtx, oid, bson.M{"$set": item})
 	if err != nil {
 		return err
 	}
 
 	return nil
 
+}
+
+func (s *Storage) DeleteItem(ctx context.Context, id string) error {
+	oid, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+
+	filter := bson.M{"_id": oid}
+
+	mongoCtx, cancel := wrapContextWithTimeout(ctx)
+	defer cancel()
+
+	_, err = s.Item.DeleteOne(mongoCtx, filter)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
