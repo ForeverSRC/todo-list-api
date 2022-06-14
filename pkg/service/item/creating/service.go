@@ -6,11 +6,10 @@ import (
 
 	"github.com/ForeverSRC/todo-list-api/pkg/model"
 	"github.com/ForeverSRC/todo-list-api/pkg/repository"
-	"github.com/ForeverSRC/todo-list-api/pkg/vo"
 )
 
 type Service interface {
-	CreateItem(ctx context.Context, item vo.ItemVo) error
+	CreateItem(ctx context.Context, item model.ItemVo) error
 }
 
 type Repository interface {
@@ -21,16 +20,19 @@ type service struct {
 	repo Repository
 }
 
-// NewService creates an adding service with the necessary dependencies
 func NewService(r Repository) Service {
 	return &service{r}
 }
 
-func (s *service) CreateItem(ctx context.Context, item vo.ItemVo) error {
+func (s *service) CreateItem(ctx context.Context, item model.ItemVo) error {
 	i := model.Item{
 		ItemVo: item,
 	}
-	i.State = model.ItemStateUnFinished
-	i.CreateTime = time.Now()
+	i.State = model.ItemStateUnFinished.Pointer()
+
+	now := time.Now()
+	i.CreateTime = now
+	i.UpdateTime = now
+
 	return s.repo.InsertItem(ctx, i)
 }

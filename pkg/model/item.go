@@ -7,44 +7,41 @@ import (
 type ItemState uint
 
 const (
-	ItemStateUnFinished ItemState = 1
-	ItemStateFinished   ItemState = 2
+	ItemStateInit ItemState = iota
+	ItemStateUnFinished
+	ItemStateFinished
 )
-
-var stateMap = map[ItemState]string{
-	ItemStateFinished:   "finished",
-	ItemStateUnFinished: "unfinished",
-}
-
-func (s ItemState) String() string {
-	return stateMap[s]
-}
 
 func (s ItemState) ValidState() bool {
 	switch s {
-	case ItemStateFinished, ItemStateUnFinished:
+	case ItemStateInit, ItemStateFinished, ItemStateUnFinished:
 		return true
 	default:
 		return false
 	}
 }
 
+func (s ItemState) Pointer() *ItemState {
+	return &s
+}
+
 type Item struct {
-	Id string `json:"id" bson:"_id"`
+	Id string `json:"id" bson:"_id,omitempty"`
 
-	ItemVo
+	ItemVo `json:",inline" bson:",inline"`
 
-	State ItemState `json:"state" bson:"state"`
+	State *ItemState `json:"state" bson:"state,omitempty"`
 
-	CreateTime time.Time `json:"createTime" bson:"create_time"`
-	FinishTime time.Time `json:"finishTime" bson:"finish_time"`
+	CreateTime time.Time `json:"createTime" bson:"create_time,omitempty"`
+	UpdateTime time.Time `json:"updateTime" bson:"update_time,omitempty"`
+	FinishTime time.Time `json:"finishTime" bson:"finish_time,omitempty"`
 }
 
 type ItemList []Item
 
 type ItemVo struct {
-	Title       string   `json:"title" bson:"title" binding:"required"`
-	Tags        []string `json:"tags" bson:"tags"`
-	Score       uint     `json:"score" bson:"score"`
-	Description string   `json:"description" bson:"description"`
+	Title       string   `json:"title" bson:"title,omitempty" binding:"required"`
+	Tags        []string `json:"tags" bson:"tags,omitempty"`
+	Score       uint     `json:"score" bson:"score,omitempty"`
+	Description string   `json:"description" bson:"description,omitempty"`
 }

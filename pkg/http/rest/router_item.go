@@ -5,18 +5,22 @@ import (
 
 	"github.com/ForeverSRC/todo-list-api/pkg/model"
 	itemcreating "github.com/ForeverSRC/todo-list-api/pkg/service/item/creating"
+	itemdeleting "github.com/ForeverSRC/todo-list-api/pkg/service/item/deleting"
+	itemediting "github.com/ForeverSRC/todo-list-api/pkg/service/item/editing"
 	itemlisting "github.com/ForeverSRC/todo-list-api/pkg/service/item/listing"
 	itemmanaging "github.com/ForeverSRC/todo-list-api/pkg/service/item/managing"
 	"github.com/ForeverSRC/todo-list-api/pkg/vo"
 	"github.com/gin-gonic/gin"
 )
 
-func loadApiRouterGroup(router *gin.Engine, ic itemcreating.Service, il itemlisting.Service, im itemmanaging.Service) {
+func loadItemRouterGroup(router *gin.Engine, app *App) {
 	groupA := router.Group("/api")
 	{
-		groupA.POST("/items", createItem(ic))
-		groupA.GET("/items", listItems(il))
-		groupA.PUT("/items/{:id}/state", changeItemState(im))
+		groupA.POST("/items", createItem(app.ItemCreator))
+		groupA.GET("/items", listItems(app.ItemLister))
+		groupA.PUT("/items/:id", editItem(app.ItemEditor))
+		groupA.PUT("/items/:id/state", changeItemState(app.ItemManager))
+		groupA.DELETE("/items/:id", deleteItem(app.ItemDeleter))
 	}
 
 }
@@ -86,5 +90,49 @@ func changeItemState(im itemmanaging.Service) gin.HandlerFunc {
 		}
 
 		successJsonRes(c, nil)
+	}
+}
+
+func deleteItem(idel itemdeleting.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		if id == "" {
+			errJsonRes(c, "empty item id")
+			return
+		}
+
+		err := idel.DeleteItem(c.Request.Context(), id)
+		if err != nil {
+			errJsonRes(c, fmt.Sprintf("err: %v", err))
+			return
+		}
+
+		successJsonRes(c, nil)
+
+	}
+}
+
+func editItem(ie itemediting.Service) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		id := c.Param("id")
+		if id == "" {
+			errJsonRes(c, "empty item id")
+			return
+		}
+
+		var item vo.ItemEditRequest
+		if err := c.ShouldBind(&item); err != nil {
+			errJsonRes(c, fmt.Sprintf("binding error: %v", err))
+			return
+		}
+
+		err := ie.Edit(c.Request.Context(), id, item)
+		if err != nil {
+			errJsonRes(c, fmt.Sprintf("err: %v", err))
+			return
+		}
+
+		successJsonRes(c, nil)
+
 	}
 }

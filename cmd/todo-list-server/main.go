@@ -12,6 +12,8 @@ import (
 	"github.com/ForeverSRC/todo-list-api/pkg/config"
 	"github.com/ForeverSRC/todo-list-api/pkg/http/rest"
 	itemcreating "github.com/ForeverSRC/todo-list-api/pkg/service/item/creating"
+	itemdeleting "github.com/ForeverSRC/todo-list-api/pkg/service/item/deleting"
+	itemediting "github.com/ForeverSRC/todo-list-api/pkg/service/item/editing"
 	itemlisting "github.com/ForeverSRC/todo-list-api/pkg/service/item/listing"
 	itemmanaging "github.com/ForeverSRC/todo-list-api/pkg/service/item/managing"
 	"github.com/ForeverSRC/todo-list-api/pkg/storage/mongodb"
@@ -23,19 +25,18 @@ func init() {
 
 func main() {
 
-	var itemStore *mongodb.Storage
-	var itemCreator itemcreating.Service
-	var itemLister itemlisting.Service
-	var itemStateManager itemmanaging.Service
-
-	itemStore = mongodb.NewStorage(config.Config.GetString("mongo.url"), config.Config.GetString("mongo.db"))
+	itemStore := mongodb.NewStorage(config.Config.GetString("mongo.url"), config.Config.GetString("mongo.db"))
 	defer itemStore.Close()
 
-	itemCreator = itemcreating.NewService(itemStore)
-	itemLister = itemlisting.NewService(itemStore)
-	itemStateManager = itemmanaging.NewService(itemStore)
+	app := &rest.App{
+		ItemLister:  itemlisting.NewService(itemStore),
+		ItemCreator: itemcreating.NewService(itemStore),
+		ItemEditor:  itemediting.NewService(itemStore),
+		ItemManager: itemmanaging.NewService(itemStore),
+		ItemDeleter: itemdeleting.NewService(itemStore),
+	}
 
-	handler := rest.Handler(itemCreator, itemLister, itemStateManager)
+	handler := rest.Handler(app)
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%v", config.Config.Get("port")),

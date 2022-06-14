@@ -13,7 +13,6 @@ const (
 )
 
 type ItemListQuery struct {
-	Uid      string          `form:"uid"`
 	State    model.ItemState `form:"state"`
 	Page     int64           `form:"page"`
 	PageSize int64           `form:"pageSize"`
@@ -35,4 +34,8 @@ func (q *ItemListQuery) CheckAndFix() error {
 type ItemManageRequest struct {
 	Id    string          `json:"id"`
 	State model.ItemState `json:"state"`
+}
+
+type ItemEditRequest struct {
+	Description string `json:"description"`
 }
