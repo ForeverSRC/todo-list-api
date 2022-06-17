@@ -32,16 +32,20 @@ type Item struct {
 
 	State *ItemState `json:"state" bson:"state,omitempty"`
 
-	CreateTime time.Time `json:"createTime" bson:"create_time,omitempty"`
-	UpdateTime time.Time `json:"updateTime" bson:"update_time,omitempty"`
-	FinishTime time.Time `json:"finishTime" bson:"finish_time,omitempty"`
+	CreateTime *time.Time `json:"createTime" bson:"create_time,omitempty"`
+	UpdateTime *time.Time `json:"updateTime" bson:"update_time,omitempty"`
+	FinishTime *time.Time `json:"finishTime" bson:"finish_time,omitempty"`
 }
 
-type ItemList []Item
-
 type ItemVo struct {
-	Title       string   `json:"title" bson:"title,omitempty" binding:"required"`
-	Tags        []string `json:"tags" bson:"tags,omitempty"`
-	Score       uint     `json:"score" bson:"score,omitempty"`
-	Description string   `json:"description" bson:"description,omitempty"`
+	Title          string   `json:"title" bson:"title,omitempty"`
+	Tags           []string `json:"tags" bson:"tags,omitempty"`
+	Score          *uint    `json:"score" bson:"score,omitempty"`
+	Description    *string  `json:"description" bson:"description,omitempty"`
+	RelatedMission string   `json:"relatedMission" bson:"related_mission,omitempty"`
+}
+
+type ItemList struct {
+	Items  []Item `json:"items"`
+	NoMore bool   `json:"noMore"`
 }

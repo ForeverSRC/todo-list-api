@@ -10,23 +10,25 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func (s *Storage) InsertItem(ctx context.Context, item model.Item) error {
+func (s *Storage) InsertItem(ctx context.Context, item model.Item) (string, error) {
 	mongoCtx, cancel := wrapContextWithTimeout(ctx)
 	defer cancel()
 
-	_, err := s.Item.InsertOne(mongoCtx, item)
+	res, err := s.Item.InsertOne(mongoCtx, item)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	id := res.InsertedID.(primitive.ObjectID).Hex()
+	return id, nil
 
 }
 
-func (s *Storage) FetchItems(ctx context.Context, query *vo.ItemListQuery) (model.ItemList, error) {
-	skip := query.PageSize * (query.Page - 1)
+func (s *Storage) FetchItems(ctx context.Context, query *vo.ItemListQuery) (*model.ItemList, error) {
+	total := query.PageSize * query.Page
+	skip := total - query.PageSize
 
-	result := make(model.ItemList, 0, query.PageSize)
+	result := make([]model.Item, 0, query.PageSize)
 
 	mongoCtx, cancel := wrapContextWithTimeout(ctx)
 	defer cancel()
@@ -39,10 +41,6 @@ func (s *Storage) FetchItems(ctx context.Context, query *vo.ItemListQuery) (mode
 	count, err := s.Item.CountDocuments(mongoCtx, filter)
 	if err != nil {
 		return nil, err
-	}
-
-	if count < skip {
-		return result, nil
 	}
 
 	opts := &options.FindOptions{
@@ -66,7 +64,10 @@ func (s *Storage) FetchItems(ctx context.Context, query *vo.ItemListQuery) (mode
 		result = append(result, item)
 	}
 
-	return result, nil
+	return &model.ItemList{
+		Items:  result,
+		NoMore: count <= total,
+	}, nil
 }
 
 func (s *Storage) GetItem(ctx context.Context, id string) (*model.Item, error) {
@@ -110,10 +111,10 @@ func (s *Storage) UpdateItem(ctx context.Context, id string, item model.Item) er
 
 }
 
-func (s *Storage) DeleteItem(ctx context.Context, id string) error {
+func (s *Storage) DeleteItem(ctx context.Context, id string) (model.Item, error) {
 	oid, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		return err
+		return model.Item{}, err
 	}
 
 	filter := bson.M{"_id": oid}
@@ -121,10 +122,56 @@ func (s *Storage) DeleteItem(ctx context.Context, id string) error {
 	mongoCtx, cancel := wrapContextWithTimeout(ctx)
 	defer cancel()
 
-	_, err = s.Item.DeleteOne(mongoCtx, filter)
-	if err != nil {
-		return err
+	res := s.Item.FindOneAndDelete(mongoCtx, filter)
+	if res.Err() != nil {
+		return model.Item{}, res.Err()
 	}
 
-	return nil
+	var item model.Item
+	err = res.Decode(&item)
+	if err != nil {
+		return model.Item{}, err
+	}
+
+	return item, nil
+}
+
+func (s *Storage) FetchItemsByIds(ctx context.Context, ids []string) (map[string]model.Item, error) {
+	numbers := len(ids)
+	if numbers == 0 {
+		return map[string]model.Item{}, nil
+	}
+
+	oids := make([]primitive.ObjectID, 0, numbers)
+
+	for _, id := range ids {
+		oid, err := primitive.ObjectIDFromHex(id)
+		if err != nil {
+			return nil, err
+		}
+		oids = append(oids, oid)
+	}
+
+	filter := bson.M{"_id": bson.M{"$in": oids}}
+	mongoCtx, cancel := wrapContextWithTimeout(ctx)
+	defer cancel()
+
+	cur, err := s.Item.Find(mongoCtx, filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cur.Close(mongoCtx)
+
+	items := make(map[string]model.Item, numbers)
+
+	for cur.Next(mongoCtx) {
+		var item model.Item
+		err = cur.Decode(&item)
+		if err != nil {
+			return nil, err
+		}
+		items[item.Id] = item
+	}
+
+	return items, nil
 }

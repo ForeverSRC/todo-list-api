@@ -16,6 +16,11 @@ import (
 	itemediting "github.com/ForeverSRC/todo-list-api/pkg/service/item/editing"
 	itemlisting "github.com/ForeverSRC/todo-list-api/pkg/service/item/listing"
 	itemmanaging "github.com/ForeverSRC/todo-list-api/pkg/service/item/managing"
+	missioncreating "github.com/ForeverSRC/todo-list-api/pkg/service/mission/creating"
+	missiondetail "github.com/ForeverSRC/todo-list-api/pkg/service/mission/detail"
+	missionitemadd "github.com/ForeverSRC/todo-list-api/pkg/service/mission/itemadd"
+	missionlisting "github.com/ForeverSRC/todo-list-api/pkg/service/mission/listing"
+	missionupdate "github.com/ForeverSRC/todo-list-api/pkg/service/mission/update"
 	"github.com/ForeverSRC/todo-list-api/pkg/storage/mongodb"
 )
 
@@ -29,11 +34,20 @@ func main() {
 	defer itemStore.Close()
 
 	app := &rest.App{
-		ItemLister:  itemlisting.NewService(itemStore),
-		ItemCreator: itemcreating.NewService(itemStore),
-		ItemEditor:  itemediting.NewService(itemStore),
-		ItemManager: itemmanaging.NewService(itemStore),
-		ItemDeleter: itemdeleting.NewService(itemStore),
+		ItemService: rest.ItemService{
+			ItemLister:  itemlisting.NewService(itemStore),
+			ItemCreator: itemcreating.NewService(itemStore),
+			ItemEditor:  itemediting.NewService(itemStore),
+			ItemManager: itemmanaging.NewService(itemStore),
+			ItemDeleter: itemdeleting.NewService(itemStore),
+		},
+		MissionService: rest.MissionService{
+			MissionCreator:   missioncreating.NewService(itemStore),
+			MissionLister:    missionlisting.NewService(itemStore),
+			MissionDetail:    missiondetail.NewService(itemStore),
+			MissionUpdater:   missionupdate.NewService(itemStore),
+			MissionItemAdder: missionitemadd.NewService(itemStore),
+		},
 	}
 
 	handler := rest.Handler(app)

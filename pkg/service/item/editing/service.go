@@ -6,11 +6,10 @@ import (
 
 	"github.com/ForeverSRC/todo-list-api/pkg/model"
 	"github.com/ForeverSRC/todo-list-api/pkg/repository"
-	"github.com/ForeverSRC/todo-list-api/pkg/vo"
 )
 
 type Service interface {
-	Edit(ctx context.Context, id string, req vo.ItemEditRequest) error
+	Edit(ctx context.Context, id string, value model.ItemVo) error
 }
 
 type Repository interface {
@@ -27,12 +26,12 @@ func NewService(r Repository) Service {
 	}
 }
 
-func (s *service) Edit(ctx context.Context, id string, req vo.ItemEditRequest) error {
+func (s *service) Edit(ctx context.Context, id string, value model.ItemVo) error {
+	now := time.Now()
 	i := model.Item{
-		UpdateTime: time.Now(),
+		UpdateTime: &now,
+		ItemVo:     value,
 	}
-
-	i.Description = req.Description
 
 	return s.repo.UpdateItem(ctx, id, i)
 }

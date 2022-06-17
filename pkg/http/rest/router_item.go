@@ -34,12 +34,15 @@ func createItem(ic itemcreating.Service) gin.HandlerFunc {
 			return
 		}
 
-		if err := ic.CreateItem(c.Request.Context(), item); err != nil {
+		id, err := ic.CreateItem(c.Request.Context(), item)
+		if err != nil {
 			errJsonRes(c, fmt.Sprintf("create item error: %v", err))
 			return
 		}
 
-		successJsonRes(c, nil)
+		successJsonRes(c, gin.H{
+			"itemId": id,
+		})
 	}
 }
 
@@ -57,9 +60,7 @@ func listItems(il itemlisting.Service) gin.HandlerFunc {
 			return
 		}
 
-		successJsonRes(c, gin.H{
-			"items": list,
-		})
+		successJsonRes(c, list)
 	}
 }
 
@@ -120,7 +121,7 @@ func editItem(ie itemediting.Service) gin.HandlerFunc {
 			return
 		}
 
-		var item vo.ItemEditRequest
+		var item model.ItemVo
 		if err := c.ShouldBind(&item); err != nil {
 			errJsonRes(c, fmt.Sprintf("binding error: %v", err))
 			return

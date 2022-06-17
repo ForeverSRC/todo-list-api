@@ -12,11 +12,12 @@ type ItemGetter interface {
 }
 
 type ItemCreator interface {
-	InsertItem(ctx context.Context, item model.Item) error
+	InsertItem(ctx context.Context, item model.Item) (string, error)
 }
 
 type ItemLister interface {
-	FetchItems(ctx context.Context, query *vo.ItemListQuery) (model.ItemList, error)
+	FetchItems(ctx context.Context, query *vo.ItemListQuery) (*model.ItemList, error)
+	FetchItemsByIds(ctx context.Context, ids []string) (map[string]model.Item, error)
 }
 
 type ItemUpdater interface {
@@ -24,5 +25,5 @@ type ItemUpdater interface {
 }
 
 type ItemDeleter interface {
-	DeleteItem(ctx context.Context, id string) error
+	DeleteItem(ctx context.Context, id string) (model.Item, error)
 }

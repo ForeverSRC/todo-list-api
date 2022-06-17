@@ -9,7 +9,7 @@ import (
 )
 
 type Service interface {
-	CreateItem(ctx context.Context, item model.ItemVo) error
+	CreateItem(ctx context.Context, item model.ItemVo) (string, error)
 }
 
 type Repository interface {
@@ -24,15 +24,15 @@ func NewService(r Repository) Service {
 	return &service{r}
 }
 
-func (s *service) CreateItem(ctx context.Context, item model.ItemVo) error {
+func (s *service) CreateItem(ctx context.Context, item model.ItemVo) (string, error) {
 	i := model.Item{
 		ItemVo: item,
 	}
 	i.State = model.ItemStateUnFinished.Pointer()
 
 	now := time.Now()
-	i.CreateTime = now
-	i.UpdateTime = now
+	i.CreateTime = &now
+	i.UpdateTime = &now
 
 	return s.repo.InsertItem(ctx, i)
 }
