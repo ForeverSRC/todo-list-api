@@ -26,6 +26,7 @@ func Handler(app *App) *gin.Engine {
 	router := gin.Default()
 
 	loadItemRouterGroup(router, app)
+	loadMissionRouterGroup(router, app)
 
 	return router
 }

@@ -12,6 +12,7 @@ type Service interface {
 
 type Repository interface {
 	repository.ItemDeleter
+	repository.MissionItemDeleter
 }
 
 type service struct {
@@ -25,5 +26,14 @@ func NewService(r Repository) Service {
 }
 
 func (s *service) DeleteItem(ctx context.Context, id string) error {
-	return s.repo.DeleteItem(ctx, id)
+	item, err := s.repo.DeleteItem(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	if len(item.RelatedMission) > 0 {
+		return s.repo.DeleteItemFromMission(ctx, item.RelatedMission, item.Id)
+	}
+
+	return nil
 }

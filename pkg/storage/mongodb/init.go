@@ -12,7 +12,7 @@ import (
 	arrayutil "github.com/ForeverSRC/todo-list-api/pkg/utils/array"
 )
 
-var collections = []string{"item"}
+var collections = []string{"item", "mission"}
 
 type Storage struct {
 	Context context.Context
@@ -20,7 +20,8 @@ type Storage struct {
 	Cancel  context.CancelFunc
 	db      *mongo.Database
 
-	Item *mongo.Collection
+	Item    *mongo.Collection
+	Mission *mongo.Collection
 }
 
 func NewStorage(connStr string, db string) *Storage {
@@ -34,6 +35,7 @@ func NewStorage(connStr string, db string) *Storage {
 	}
 
 	store.Item = store.db.Collection("item")
+	store.Mission = store.db.Collection("mission")
 
 	return store
 }

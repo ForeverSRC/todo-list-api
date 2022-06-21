@@ -34,9 +34,9 @@ func (s *service) ChangeItemState(ctx context.Context, req *vo.ItemManageRequest
 	}
 
 	now := time.Now()
-	item.UpdateTime = now
+	item.UpdateTime = &now
 	if req.State == model.ItemStateFinished {
-		item.FinishTime = now
+		item.FinishTime = &now
 	}
 
 	err := s.repo.UpdateItem(ctx, req.Id, item)
